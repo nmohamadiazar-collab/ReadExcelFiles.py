@@ -1,0 +1,51 @@
+from openpyxl import load_workbook
+import pandas as pd
+
+# =========================
+# CHANGE THIS ONLY
+# =========================
+FILE_PATH = r"C:\X\Y\Z\X.xlsx"   # <-- put your Excel file path here
+
+START_SHEET_NUMBER = 2   # start from sheet #2 (skip sheet #1)
+CELL_LABEL = "A21"
+CELL_VALUE = "Z46"
+
+def main():
+    wb = load_workbook(FILE_PATH, data_only=True)
+    sheetnames = wb.sheetnames
+    total_sheets = len(sheetnames)
+
+    if total_sheets < START_SHEET_NUMBER:
+        print(f"Workbook has only {total_sheets} sheet(s). Nothing to read starting at sheet #{START_SHEET_NUMBER}.")
+        return
+
+    rows = []
+
+    print("\n=== Reading each sheet starting from sheet #2 ===\n")
+
+    # Excel sheet numbers are 1-based; Python list indexes are 0-based
+    for sheet_number in range(START_SHEET_NUMBER, total_sheets + 1):
+        sheet_name = sheetnames[sheet_number - 1]
+        ws = wb[sheet_name]
+
+        label = ws[CELL_LABEL].value
+        value = ws[CELL_VALUE].value
+
+        print(f"Sheet #{sheet_number} | {sheet_name} | {CELL_LABEL}={label} | {CELL_VALUE}={value}")
+
+        rows.append({
+            "sheet_number": sheet_number,
+            "sheet_name": sheet_name,
+            "A21": label,
+            "Z46": value
+        })
+
+    df = pd.DataFrame(rows)
+    df.to_excel("A21_Z46_all_sheets.xlsx", index=False)
+    df.to_csv("A21_Z46_all_sheets.csv", index=False)
+
+    print("\nSaved: A21_Z46_all_sheets.xlsx")
+    print("Saved: A21_Z46_all_sheets.csv")
+
+if __name__ == "__main__":
+    main()
